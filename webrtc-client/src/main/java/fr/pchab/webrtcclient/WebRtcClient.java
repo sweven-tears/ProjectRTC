@@ -299,8 +299,8 @@ public class WebRtcClient {
         client.on("message", messageHandler.onMessage);
         client.connect();
 
-        iceServers.add(new PeerConnection.IceServer("stun:23.21.150.121"));
-        iceServers.add(new PeerConnection.IceServer("stun:stun.l.google.com:19302"));
+        iceServers.add(new PeerConnection.IceServer("stun:stun:rixtelecom.se"));
+        iceServers.add(new PeerConnection.IceServer("stun:stun:schlund.de"));
 
         pcConstraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveAudio", "true"));
         pcConstraints.mandatory.add(new MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"));
@@ -380,7 +380,15 @@ public class WebRtcClient {
     }
 
     private VideoCapturer getVideoCapturer() {
-        String frontCameraDeviceName = VideoCapturerAndroid.getNameOfFrontFacingDevice();
-        return VideoCapturerAndroid.create(frontCameraDeviceName);
+        String name;
+        name = VideoCapturerAndroid.getNameOfFrontFacingDevice();
+        if (name == null) {
+            name = VideoCapturerAndroid.getNameOfBackFacingDevice();
+        }
+        if (name == null) {
+            throw new NullPointerException("相机获取失败");
+        }
+        Log.e("WebRtcClient", name);
+        return VideoCapturerAndroid.create(name);
     }
 }
